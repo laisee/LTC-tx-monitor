@@ -1,10 +1,11 @@
-var bodyParser    = require('body-parser');
-var express 	  = require('express');
-var redis         = require('redis');
-var request       = require('request');
-var rp            = require('request-promise');
+const addy        = require('./utils/address');      
+const bodyParser  = require('body-parser');
+const express 	  = require('express');
+const redis       = require('redis');
+const request     = require('request');
+const rp          = require('request-promise');
 
-var app           = express()
+const app         = express()
 //var client      = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
 
 // assign app settings from envvironment || defaults
@@ -12,9 +13,9 @@ const port    = process.env.PORT || 8080;
 const name    = process.env.HEROKU_APP_NAME || 'Unknown Name';
 const version = process.env.HEROKU_RELEASE_VERSION || 'Unknown Version';
 
+const deposit_address_list = addy.getAddressList('ltc');
 const LTC_TX_URL = "https://chain.so/api/v2/get_tx_received/LTC/";
 const update_url = 'https://api.abelegroup.io/monitoring/update_transaction';
-const deposit_address_list = getAddressList();
 
 // parse application/json
 app.use(bodyParser.json())
@@ -95,25 +96,6 @@ app.get('/transaction/total', function(req, res) {
         res.status(500);
     });
 });
-
-function getAddressList() {
-  let list;
-  if (process.env.LTC_ADDRESS_LIST) {
-    try {
-      list = process.env.LTC_ADDRESS_LIST;
-      if (list) {
-        list = list.split(',');
-      }
-    }
-    catch (err) {
-      console.log(err);
-      throw err;
-    }
-  } else {
-    throw "LTC Address list doesnt exist in process.env ...";
-  }
-  return list;
-}
 
 // Start the app listening to default port
 app.listen(port, function() {
