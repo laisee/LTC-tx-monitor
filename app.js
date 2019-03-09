@@ -1,12 +1,10 @@
 const addy        = require('./utils/address');      
 const bodyParser  = require('body-parser');
 const express 	  = require('express');
-const redis       = require('redis');
 const request     = require('request');
 const rp          = require('request-promise');
 
 const app         = express()
-//var client      = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
 
 // assign app settings from envvironment || defaults
 const port    = process.env.PORT || 8080;
@@ -15,7 +13,7 @@ const version = process.env.HEROKU_RELEASE_VERSION || 'Unknown Version';
 
 const deposit_address_list = addy.getAddressList('ltc');
 const LTC_TX_URL = "https://chain.so/api/v2/get_tx_received/LTC/";
-const update_url = 'https://api.abelegroup.io/monitoring/update_transaction';
+const update_url         = process.env.API_UPDATE_URL;
 
 // parse application/json
 app.use(bodyParser.json())
