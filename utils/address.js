@@ -2,6 +2,7 @@ module.exports = {
   getAddressList: function(coin) {
     let list;
     if (process.env[coin.toUpperCase()+"_ADDRESS_LIST"]) {
+
       try {
         list = process.env[coin.toUpperCase()+"_ADDRESS_LIST"];
         if (list) {
