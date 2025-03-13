@@ -11,9 +11,12 @@ const port    = process.env.PORT || 8080;
 const name    = process.env.HEROKU_APP_NAME || 'Unknown Name';
 const version = process.env.HEROKU_RELEASE_VERSION || 'Unknown Version';
 
-const deposit_address_list = addy.getAddressList('ltc');
+let deposit_address_list = process.env.LTC_ADDRESS_LIST
+  ? process.env.LTC_ADDRESS_LIST.split(',').map(address => address.trim())
+  : [];
+
 const LTC_TX_URL = "https://chain.so/api/v2/get_tx_received/LTC/";
-const update_url         = process.env.API_UPDATE_URL;
+const update_url = process.env.API_UPDATE_URL;
 
 // parse application/json
 app.use(bodyParser.json())
