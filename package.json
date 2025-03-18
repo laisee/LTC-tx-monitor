@@ -9,11 +9,13 @@
     "request-promise": "^4.2.6"
   },
   "overrides": {
-      "json-schema": "^0.4.0"
+    "json-schema": "^0.4.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+     "test": "jest"
   },
   "author": "",
   "license": "ISC",
