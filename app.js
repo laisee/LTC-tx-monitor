@@ -90,7 +90,9 @@ app.get('/transaction/total', function(req, res) {
        uri: url,
        json: true
     };
-    rp(options).then(function(body) {
+    axios.get(url)
+    .then(function(response) {
+        const body = response.data;
         const total = body.result;
         const ts = +new Date()
         res.json({"currency": "LTC","total": total, "timestamp": ts});
