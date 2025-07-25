@@ -1,8 +1,7 @@
 const addy        = require('./utils/address');      
 const bodyParser  = require('body-parser');
 const express 	  = require('express');
-const request     = require('request');
-const rp          = require('request-promise');
+const axios       = require('axios');
 
 const app         = express()
 
@@ -40,10 +39,10 @@ app.post('/transaction/update', function(req, res) {
   for (var address of deposit_address_list) {
     const url = LTC_TX_URL + address;
     console.log("Checking address "+url);
-    let options = { uri: url, json: true };
     promises.push(
-      rp(options)
-      .then(function(body) { 
+      axios.get(url)
+      .then(function(response) { 
+        const body = response.data;
         //console.log("Transactions "+JSON.stringify(body.data.txs));
         for (var txn of body.data.txs) {
           let data = {};
@@ -54,19 +53,22 @@ app.post('/transaction/update', function(req, res) {
           data["currency"] = 'LTC';
           count++;
           total += txn.value;;
-          request.post({ url: update_url, method: "POST", json: true, body: data },
-          function (error, response, body) {
-            if (response.statusCode == 200) {
+          axios.post(update_url, data)
+          .then(function(response) {
+            if (response.status === 200) {
               console.log("Updated "+data.tx_id+" successfully for sending wallet"+txn.from);
             } else {
-              console.log("Update of txn "+data.tx_id+ " failed. status was "+response.statusCode);
-              errors.push("Error " +response.statusCode+"  while updating "+error);
+              console.log("Update of txn "+data.tx_id+ " failed. status was "+response.status);
+              errors.push("Error " +response.status+"  while updating");
             }
+          })
+          .catch(function(error) {
+            errors.push("Error " +error.response.status+"  while updating");
           });
         }
       })
-      .catch(function (err) {
-        errors.push(err)
+      .catch(function(error) {
+        errors.push(error);
       })
     );
   }
