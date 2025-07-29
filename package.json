@@ -6,10 +6,10 @@
     "axios": "^1.11.0",
     "body-parser": "^2.2.0",
     "express": "^5.1.0",
-    "npm": "^11.5.1"
+    "form-data": ">=2.5.4",
+    "npm": "^11.5.1",
     "request": "^2.88.2",
-    "request-promise": "^4.2.6",
-     "form-data": ">=2.5.4"
+    "request-promise": "^4.2.6"
   },
   "overrides": {
     "json-schema": "^0.4.0"
