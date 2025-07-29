@@ -4,16 +4,16 @@
   "main": "app.js",
   "dependencies": {
     "axios": "^1.11.0",
-    "body-parser": "^1.20.3",
-    "express": "^4.21.2",
-     "form-data": ">=2.5.4"
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "npm": "^11.5.1"
   },
   "overrides": {
     "json-schema": "^0.4.0"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
-    "jest": "^29.7.0",
+    "jest": "^30.0.5",
     "supertest": "^7.1.4"
   },
   "scripts": {
