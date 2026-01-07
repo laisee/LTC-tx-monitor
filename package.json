@@ -6,7 +6,7 @@
     "axios": "^1.12.0",
     "body-parser": "^2.2.0",
     "express": "^5.2.0",
-    "form-data": ">=2.5.4",
+    "form-data" ~> "2.5.4",
     "glob": ">=10.5.0",
     "npm": "^11.5.1",
     "request": "^2.88.2",
