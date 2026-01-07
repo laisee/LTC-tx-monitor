@@ -1,5 +1,11 @@
 // ltc-tx-monitor.test.js
-const request = require('supertest');
+import request from 'supertest';
+import express from 'express';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Mock environment variables for testing
 process.env.HEROKU_APP_NAME = 'LTC-Test-Monitor';
@@ -12,42 +18,35 @@ describe('LTC Transaction Monitor', () => {
 
   beforeAll(() => {
     // Create a test version of the app without starting the server
-    const express = require('express');
-    const bodyParser = require('body-parser');
-
     app = express();
 
     // Recreate the app setup without the server start
-    const port = process.env.PORT || 8080;
     const name = process.env.HEROKU_APP_NAME || 'Unknown Name';
     const version = process.env.HEROKU_RELEASE_VERSION || 'Unknown Version';
 
-    app.use(bodyParser.json());
-    app.use(express.static(__dirname + '/public'));
+    app.use(express.json());
+    app.use(express.static(join(__dirname, 'public')));
 
     // Home route
-    app.get('/', function(req, res) {
-      res.json({"name": name,"version": version});
+    app.get('/', (req, res) => {
+      res.json({ name, version });
     });
 
     // Transaction update route (simplified for testing)
-    app.post('/transaction/update', function(req, res) {
-      res.send({ status: 200, errors: [] });
+    app.post('/transaction/update', (req, res) => {
+      res.json({ status: 200, errors: [] });
     });
 
     // Transaction total route (simplified for testing)
-    app.get('/transaction/total', function(req, res) {
-      const ts = +new Date();
-      res.json({"currency": "LTC","total": 0, "timestamp": ts});
+    app.get('/transaction/total', (req, res) => {
+      const timestamp = Date.now();
+      res.json({ currency: 'LTC', total: 0, timestamp });
     });
   });
 
   describe('API Endpoints', () => {
     test('should return app info on GET /', async () => {
-      const response = await request(app)
-        .get('/')
-        .expect(200)
-        .expect('Content-Type', /json/);
+      const response = await request(app).get('/').expect(200).expect('Content-Type', /json/);
 
       expect(response.body.name).toBe('LTC-Test-Monitor');
       expect(response.body.version).toBe('v1.0.0-test');
@@ -64,8 +63,7 @@ describe('LTC Transaction Monitor', () => {
     }, 15000); // 15 second timeout for API calls
 
     test('should handle GET /transaction/total endpoint', async () => {
-      const response = await request(app)
-        .get('/transaction/total');
+      const response = await request(app).get('/transaction/total');
 
       // This endpoint might fail due to external API, but should not crash
       expect(response.status).toBeGreaterThanOrEqual(200);
@@ -75,7 +73,7 @@ describe('LTC Transaction Monitor', () => {
 
   describe('Configuration', () => {
     test('should parse LTC address list correctly', () => {
-      const addressList = process.env.LTC_ADDRESS_LIST.split(',').map(address => address.trim());
+      const addressList = process.env.LTC_ADDRESS_LIST.split(',').map((address) => address.trim());
       expect(Array.isArray(addressList)).toBe(true);
       expect(addressList.length).toBeGreaterThan(0);
       expect(addressList).toContain('LTC1234567890abcdef');
@@ -92,7 +90,7 @@ describe('LTC Transaction Monitor', () => {
       const mockTxn = {
         txid: 'ltc_test_hash_123',
         script_hex: 'script_hex_data',
-        value: 100000000 // 1 LTC in satoshi
+        value: 100000000, // 1 LTC in satoshi
       };
 
       const data = {
@@ -100,7 +98,7 @@ describe('LTC Transaction Monitor', () => {
         tx_id: mockTxn.txid,
         tx_hash: mockTxn.script_hex,
         amount: mockTxn.value,
-        currency: 'LTC'
+        currency: 'LTC',
       };
 
       expect(data.wallet_address).toBe('TBD');
@@ -125,10 +123,10 @@ describe('LTC Transaction Monitor', () => {
             {
               txid: 'ltc_test_hash_123',
               script_hex: 'script_hex_data',
-              value: 100000000
-            }
-          ]
-        }
+              value: 100000000,
+            },
+          ],
+        },
       };
 
       expect(mockApiResponse.data).toHaveProperty('txs');
@@ -140,22 +138,22 @@ describe('LTC Transaction Monitor', () => {
   });
 
   describe('Utility Functions', () => {
-    test('should handle address list parsing', () => {
-      const addr = require('./utils/address');
-      const addressList = addr.getAddressList('ltc');
+    test('should handle address list parsing', async () => {
+      const { getAddressList } = await import('./utils/address.js');
+      const addressList = getAddressList('ltc');
       expect(Array.isArray(addressList)).toBe(true);
       expect(addressList.length).toBeGreaterThan(0);
     });
 
-    test('should throw error when address list is missing', () => {
-      const addr = require('./utils/address');
+    test('should throw error when address list is missing', async () => {
+      const { getAddressList } = await import('./utils/address.js');
 
       // Temporarily remove environment variable
       const originalValue = process.env.LTC_ADDRESS_LIST;
       delete process.env.LTC_ADDRESS_LIST;
 
       expect(() => {
-        addr.getAddressList('ltc');
+        getAddressList('ltc');
       }).toThrow(/LTC Address list cannot be found/);
 
       // Restore environment variable
@@ -165,15 +163,11 @@ describe('LTC Transaction Monitor', () => {
 
   describe('Error Handling', () => {
     test('should handle invalid requests gracefully', async () => {
-      await request(app)
-        .get('/nonexistent-endpoint')
-        .expect(404);
+      await request(app).get('/nonexistent-endpoint').expect(404);
     });
 
     test('should handle malformed POST data', async () => {
-      const response = await request(app)
-        .post('/transaction/update')
-        .send('invalid json');
+      const response = await request(app).post('/transaction/update').send('invalid json');
 
       // Should not crash the application
       expect(response.status).toBeGreaterThanOrEqual(200);
@@ -194,4 +188,3 @@ describe('LTC Transaction Monitor', () => {
     });
   });
 });
-

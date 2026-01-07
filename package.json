@@ -1,29 +1,37 @@
 {
   "name": "ltcmonitor",
   "version": "1.0.0",
+  "type": "module",
   "main": "app.js",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "dependencies": {
     "axios": "^1.12.0",
-    "body-parser": "^2.2.0",
-    "express": "^5.2.0",
-    "form-data" ~> "2.5.4",
-    "glob": ">=10.5.0",
-    "npm": "^11.5.1",
-    "request": "^2.88.2",
-    "request-promise": "^4.2.6"
-  },
-  "overrides": {
-    "json-schema": "^0.4.0"
+    "express": "^5.2.0"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
+    "@eslint/js": "^9.17.0",
+    "eslint": "^9.17.0",
+    "globals": "^15.14.0",
     "jest": "^30.0.5",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.4.2",
     "supertest": "^7.1.4"
   },
   "scripts": {
-    "test": "jest"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.js\"",
+    "format:check": "prettier --check \"**/*.js\""
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "LTC Transaction Monitor - Monitor Litecoin addresses for incoming transactions"
 }
